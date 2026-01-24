@@ -1,0 +1,15 @@
+@WebAPI_HostAddress = https://localhost:7076
+
+
+POST {{WebAPI_HostAddress}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "alexanderderevkov@yandex.ru",
+  "password": "Alex123456",
+  "confirmPassword": "Alex123456",
+  "name": "Alex",
+  "lastName": "Derevkov"
+}
+
+###

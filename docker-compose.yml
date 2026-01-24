@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: smartgym-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: smartgymdb
+      MYSQL_USER: smartgym
+      MYSQL_PASSWORD: smartgympassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql          # Постоянное хранение данных
+      - ./mysql/init:/docker-entrypoint-initdb.d  # Скрипты инициализации
+      - ./mysql/config:/etc/mysql/conf.d         # Конфигурационные файлы
+    networks:
+      - smartgym-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  smartgym-network:
+    driver: bridge

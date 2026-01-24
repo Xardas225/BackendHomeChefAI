@@ -1,0 +1,179 @@
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using WebAPI.Data;
+using WebAPI.Services;
+using WebAPI.Services.Interfaces;
+
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
+var builder = WebApplication.CreateBuilder(args);
+
+var configuration = builder.Configuration;
+
+builder.Services.AddControllers();
+builder.Services.AddOpenApi();
+builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+
+// ========== ПОДКЛЮЧЕНИЕ К MYSQL ==========
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+try
+{
+    // Регистрируем DbContext с MySQL
+    builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    {
+        options.UseMySql(connectionString,
+            ServerVersion.AutoDetect(connectionString), // Автоопределение версии MySQL
+            mysqlOptions =>
+            {
+                mysqlOptions.EnableRetryOnFailure(
+                    maxRetryCount: 5,
+                    maxRetryDelay: TimeSpan.FromSeconds(30),
+                    errorNumbersToAdd: null);
+            });
+
+        // Включить детальное логирование только для разработки
+        if (builder.Environment.IsDevelopment())
+        {
+            options.EnableSensitiveDataLogging()
+                   .EnableDetailedErrors()
+                   .LogTo(Console.WriteLine, LogLevel.Information);
+        }
+    });
+
+    Console.WriteLine("✅ DbContext успешно зарегистрирован с MySQL");
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"❌ ОШИБКА при настройке DbContext: {ex.Message}");
+    if (ex.InnerException != null)
+    {
+        Console.WriteLine($"Внутренняя ошибка: {ex.InnerException.Message}");
+    }
+    return;
+}
+
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:5173",
+                    "http://127.0.0.1:5173",
+                    "https://localhost:5173",
+                    "https://127.0.0.1:5173")
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials();
+        });
+});
+
+// Настройка JWT аутентификации
+var jwtSettings = builder.Configuration.GetSection("Jwt");
+var secretKey = jwtSettings["SecretKey"];
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings["Issuer"],
+        ValidAudience = jwtSettings["Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+    };
+});
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+}
+
+//app.UseHttpsRedirection();
+
+app.UseCors(MyAllowSpecificOrigins);
+
+app.UseAuthorization();
+
+app.MapControllers();
+
+app.UseAuthentication();
+
+
+
+// ========== ПРОВЕРКА ПОДКЛЮЧЕНИЯ К БАЗЕ ДАННЫХ ==========
+
+Console.WriteLine("🔍 Проверка подключения к базе данных...");
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+
+    try
+    {
+        var context = services.GetRequiredService<ApplicationDbContext>();
+
+        // Пробуем подключиться
+        var canConnect = await context.Database.CanConnectAsync();
+
+        if (canConnect)
+        {
+            Console.WriteLine("✅ Подключение к базе данных успешно!");
+
+            // Применяем миграции
+            Console.WriteLine("🔄 Применение миграций...");
+            await context.Database.MigrateAsync();
+            Console.WriteLine("✅ Миграции успешно применены");
+
+            // Выводим информацию о БД
+            var dbConnection = context.Database.GetDbConnection();
+            Console.WriteLine($"📊 Информация о базе данных:");
+            Console.WriteLine($"   Сервер: {dbConnection.DataSource}");
+            Console.WriteLine($"   База данных: {dbConnection.Database}");
+            Console.WriteLine($"   Состояние: {dbConnection.State}");
+        }
+        else
+        {
+            Console.WriteLine("❌ Не удалось подключиться к базе данных");
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"❌ ОШИБКА при подключении к базе данных: {ex.Message}");
+        Console.WriteLine("Проверьте:");
+        Console.WriteLine("1. Запущен ли MySQL сервер");
+        Console.WriteLine("2. Правильность строки подключения");
+        Console.WriteLine("3. Существует ли база данных 'smartgymdb'");
+        Console.WriteLine("4. Правильность логина и пароля");
+
+        if (ex.InnerException != null)
+        {
+            Console.WriteLine($"Подробности: {ex.InnerException.Message}");
+        }
+
+        // Можно продолжить работу без БД или завершить
+         return;
+    }
+}
+
+// Создаем таблицы в базе данных (если их нет)
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    dbContext.Database.EnsureCreated();
+}
+
+app.Run();
