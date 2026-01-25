@@ -1,0 +1,94 @@
+@startuml
+title Диаграмма классов - Модуль управления пользователями
+
+' ================ Сущности (Entities) ================
+
+entity User <<Entity>> {
+
+    +Id : int
+    +Email : string
+    +PasswordHash : string
+    +Phone : string?
+    +Name : string
+    +LastName : string
+    +CreatedAt : DateTime
+    +UpdatedAt : DateTime?
+    +RefreshToken : string?
+    +RefreshTokenExpiryTime : DateTime?
+
+
+}
+
+' ================ DTO КЛАССЫ (DTO) ================
+
+class UserResponse <<Response>>
+{
+    +Id : int
+    +Email : string
+    +Phone : string?
+    +Name : string
+    +LastName : string
+}
+
+class UpdateUserRequest <<Request>>
+{
+    +Id : int
+    +Email : string
+    +Phone : string?
+    +Name : string
+    +LastName : string
+    +UpdatedAt : DateTime
+}
+
+
+' ================ КОНТРОЛЛЕРЫ ================
+
+class UsersController <<Controller>> {
+    -_dbContext : ApplicationDbContext
+    -_logger : ILogger<UserController>
+    
+    +GetUser(id) : Task<UserResponse>
+    +GetAllUsers() : Task<List<UserResponse>>
+    +UpdateUser(id, request) : Task<UserResponse>
+}
+
+
+' ================ КОНТЕКСТ БАЗЫ ДАННЫХ ================
+class ApplicationDbContext <<Context>> {
+    +Users : DbSet<User>
+    
+    +OnModelCreating(modelBuilder)
+    +SaveChangesAsync() : Task<int>
+    +UpdateTimestamps()
+}
+
+' ================ ОТНОШЕНИЯ МЕЖДУ КЛАССАМИ ================
+
+' Наследование
+
+ApplicationDbContext --|> DbContext
+UsersController --|> ControllerBase
+
+' Композиция/Агрегация
+
+' 1. UsersController использует ApplicationDbContext
+UsersController --> ApplicationDbContext : "использует\n(-_dbContext)"
+
+' 2. UsersController принимает UpdateUserRequest
+UsersController ..> UpdateUserRequest : "принимает в методах"
+
+' 3. UsersController возвращает UserResponse
+UsersController ..> UserResponse : "возвращает"
+
+' 4. ApplicationDbContext содержит Users (DbSet<User>)
+ApplicationDbContext "1" --> "n" User : "содержит\n(+Users)"
+
+' 5. User преобразуется в UserResponse
+User ..> UserResponse : "преобразуется в\n(mapping)"
+
+' 6. UpdateUserRequest используется для обновления User
+UpdateUserRequest ..> User : "обновляет"
+
+
+
+@enduml
