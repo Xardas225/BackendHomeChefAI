@@ -5,7 +5,7 @@ namespace WebAPI.Services.Interfaces;
 
 public interface IAuthService
 {
-    Task<AuthResponse> RegisterAsync(RegisterRequest request);
-    Task<AuthResponse> LoginAsync(LoginRequest request);
+    Task<RegisterResponse> RegisterAsync(RegisterRequest request);
+    Task<LoginResponse> LoginAsync(LoginRequest request);
     Task<bool> CheckEmailExistsAsync(string email);
 }

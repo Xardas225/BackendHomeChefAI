@@ -22,16 +22,29 @@ public class AuthController : ControllerBase
         {
             var user = await _authService.RegisterAsync(request);
 
-            return Ok(new
-            {
-                message = "Регистрация успешна",
-                userId = user.Id,
-                email = user.Email
-            });
+            return Ok(user);
         }
         catch (Exception ex)
         {
             return BadRequest(new { message = ex.Message });
         }
     }
+
+
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    {
+        try
+        {
+            var user = await _authService.LoginAsync(request);
+
+            return Ok(user);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+
 }

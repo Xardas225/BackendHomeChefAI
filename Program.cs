@@ -30,7 +30,7 @@ builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 // ========== ПОДКЛЮЧЕНИЕ К MYSQL ==========
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 try
-{
+{   
     // Регистрируем DbContext с MySQL
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
     {

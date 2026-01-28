@@ -23,7 +23,7 @@ public class AuthService : IAuthService
             .AnyAsync(u => u.Email == email);
     }
 
-    public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
+    public async Task<RegisterResponse> RegisterAsync(RegisterRequest request)
     {
         // Проверяем, существует ли пользователь с таким email
         if (await CheckEmailExistsAsync(request.Email))
@@ -31,7 +31,7 @@ public class AuthService : IAuthService
             throw new ApplicationException("Пользователь с таким email уже существует");
         }
 
-        // Валидация пароля (если не использовали DataAnnotations)
+        // Валидация пароля
         if (request.Password != request.ConfirmPassword)
         {
             throw new ApplicationException("Пароли не совпадают");
@@ -54,22 +54,16 @@ public class AuthService : IAuthService
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
-        // Генерируем токен
-        var token = _jwtService.GenerateAccessToken(user);
 
         // Возвращаем ответ
-        return new AuthResponse
+        return new RegisterResponse
         {
             Id = user.Id,
             Email = user.Email,
-            Name = user.Name,
-            LastName = user.LastName,
-            Token = token,
-            TokenExpiry = DateTime.UtcNow.AddHours(2)
         };
     }
 
-    public async Task<AuthResponse> LoginAsync(LoginRequest request)
+    public async Task<LoginResponse> LoginAsync(LoginRequest request)
     {
         // Ищем пользователя по email
         var user = await _context.Users
@@ -91,7 +85,7 @@ public class AuthService : IAuthService
         // Генерируем токен
         var token = _jwtService.GenerateAccessToken(user);
 
-        return new AuthResponse
+        return new LoginResponse
         {
             Id = user.Id,
             Email = user.Email,
