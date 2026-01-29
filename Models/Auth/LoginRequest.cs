@@ -13,8 +13,7 @@ public class LoginRequest
     [MinLength(6, ErrorMessage = "Пароль должен содержать минимум 6 символов")]
     public string Password { get; set; }
 
-    [Required(ErrorMessage = "Пароль обязателен")]
-    [MinLength(6, ErrorMessage = "Пароль должен содержать минимум 6 символов")]
+    [Required(ErrorMessage = "Роль обязательна")]
     public UserRole Role { get; set; }
 }
 

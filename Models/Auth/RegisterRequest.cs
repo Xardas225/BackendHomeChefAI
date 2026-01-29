@@ -31,7 +31,6 @@ public class RegisterRequest
     [Required(ErrorMessage = "Роль обязательна")]
     public UserRole Role { get; set; }
 
-
     // Дополнительные поля для повара
     public string? KitchenName { get; set; }
     public string? ChefDescription { get; set; }
