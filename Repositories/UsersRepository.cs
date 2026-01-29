@@ -14,18 +14,18 @@ public class UsersRepository : IUsersRepository
         _dbContext = dbContext; 
     } 
 
-    public async Task<List<User>> GetAllUsersAsync()
+    public async Task<List<UserProfile>> GetAllUsersAsync()
     {
         return await _dbContext.Users.ToListAsync();
     }
 
-    public async Task<User> GetUserById(int id)
+    public async Task<UserProfile> GetUserById(int id)
     {
         var user = await _dbContext.Users.FindAsync(id);
         return user;
     }
 
-    public async Task UpdateUser(User user)
+    public async Task UpdateUser(UserProfile user)
     {
         _dbContext.Users.Update(user);
         await _dbContext.SaveChangesAsync();

@@ -7,6 +7,7 @@ using WebAPI.Repositories;
 using WebAPI.Repositories.Interfaces;
 using WebAPI.Services;
 using WebAPI.Services.Interfaces;
+using WebAPI.Models.User.Enums;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
@@ -102,6 +103,20 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]))
     };
+});
+
+
+// Добавляем политики авторизации
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("Admin", policy =>
+        policy.RequireRole(UserRole.Admin.ToString()));
+
+    options.AddPolicy("Chef", policy =>
+        policy.RequireRole(UserRole.Chef.ToString()));
+
+    options.AddPolicy("User", policy =>
+        policy.RequireRole(UserRole.User.ToString()));
 });
 
 var app = builder.Build();

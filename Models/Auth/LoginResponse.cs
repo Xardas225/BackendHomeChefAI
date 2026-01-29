@@ -1,4 +1,6 @@
-﻿namespace WebAPI.Models.Auth;
+﻿using WebAPI.Models.User.Enums;
+
+namespace WebAPI.Models.Auth;
 public class LoginResponse
 {
     public int Id { get; set; }
@@ -6,5 +8,6 @@ public class LoginResponse
     public string Name { get; set; }
     public string LastName { get; set; }
     public string Token { get; set; }
+    public UserRole Role { get; set; }
     public DateTime TokenExpiry { get; set; }
 }

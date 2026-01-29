@@ -10,7 +10,7 @@ namespace WebAPI.Data
         {
         }
 
-        public DbSet<User> Users { get; set; }
+        public DbSet<UserProfile> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -18,7 +18,7 @@ namespace WebAPI.Data
             base.OnModelCreating(modelBuilder);
 
             // Конфигурация таблицы Users
-            modelBuilder.Entity<User>(entity =>
+            modelBuilder.Entity<UserProfile>(entity =>
             {
                 // Название таблицы
                 entity.ToTable("users");
@@ -97,12 +97,12 @@ namespace WebAPI.Data
         private void UpdateTimestamps()
         {
             var entries = ChangeTracker.Entries()
-                .Where(e => e.Entity is User &&
+                .Where(e => e.Entity is UserProfile &&
                            (e.State == EntityState.Added || e.State == EntityState.Modified));
 
             foreach (var entry in entries)
             {
-                var user = (User)entry.Entity;
+                var user = (UserProfile)entry.Entity;
                 var now = DateTime.UtcNow;
 
                 if (entry.State == EntityState.Added)

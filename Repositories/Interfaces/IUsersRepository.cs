@@ -4,7 +4,7 @@ namespace WebAPI.Repositories.Interfaces;
 
 public interface IUsersRepository
 {
-    Task<List<User>> GetAllUsersAsync();
-    Task<User> GetUserById(int id);
-    Task UpdateUser(User user);
+    Task<List<UserProfile>> GetAllUsersAsync();
+    Task<UserProfile> GetUserById(int id);
+    Task UpdateUser(UserProfile user);
 }

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using WebAPI.Models.User.Enums;
 
 namespace WebAPI.Models.Auth;
 
@@ -26,4 +27,13 @@ public class RegisterRequest
     [Required(ErrorMessage = "Фамилия обязательна")]
     [StringLength(100, ErrorMessage = "Фамилия не должна превышать 100 символов")]
     public string LastName { get; set; }
+
+    [Required(ErrorMessage = "Роль обязательна")]
+    public UserRole Role { get; set; }
+
+
+    // Дополнительные поля для повара
+    public string? KitchenName { get; set; }
+    public string? ChefDescription { get; set; }
+    public string? ChefSpecialization { get; set; }
 }

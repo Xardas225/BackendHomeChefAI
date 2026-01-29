@@ -6,7 +6,7 @@ namespace WebAPI.Services.Interfaces;
 public interface IJwtService
 {
     // Генерация access токена
-    string GenerateAccessToken(User user);
+    string GenerateAccessToken(UserProfile user);
 
     // Генерация refresh токена
     string GenerateRefreshToken();

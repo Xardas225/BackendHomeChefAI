@@ -25,7 +25,7 @@ public class JwtService : IJwtService
     /// <summary>
     /// Генерация Access токена (действует 15 минут - 2 часа)
     /// </summary>
-    public string GenerateAccessToken(User user)
+    public string GenerateAccessToken(UserProfile user)
     {
         // Шаг 1: Создаем утверждения (Claims) о пользователе
         // Claims - это пары ключ-значение, которые хранят информацию о пользователе
@@ -35,6 +35,7 @@ public class JwtService : IJwtService
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()), // User ID
             new Claim(ClaimTypes.Email, user.Email), // Email пользователя
             new Claim(ClaimTypes.Name, $"{user.Name} {user.LastName}"), // Полное имя
+            new Claim(ClaimTypes.Role, user.Role.ToString()), // Добавляем роль
                 
             // JWT стандартные claims
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()), // Уникальный ID токена

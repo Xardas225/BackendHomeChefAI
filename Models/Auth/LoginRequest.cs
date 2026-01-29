@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-
+using WebAPI.Models.User.Enums;
 namespace WebAPI.Models.Auth;
 
 public class LoginRequest
@@ -12,6 +12,10 @@ public class LoginRequest
     [Required(ErrorMessage = "Пароль обязателен")]
     [MinLength(6, ErrorMessage = "Пароль должен содержать минимум 6 символов")]
     public string Password { get; set; }
+
+    [Required(ErrorMessage = "Пароль обязателен")]
+    [MinLength(6, ErrorMessage = "Пароль должен содержать минимум 6 символов")]
+    public UserRole Role { get; set; }
 }
 
 

@@ -1,8 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WebAPI.Data;
-using WebAPI.Models.User;
+using WebAPI.Models;
 using WebAPI.Models.Auth;
+using WebAPI.Models.User;
 using WebAPI.Services.Interfaces;
+using WebAPI.Models.Chef;
+using WebAPI.Models.User.Enums;
 
 namespace WebAPI.Services;
 
@@ -37,18 +40,36 @@ public class AuthService : IAuthService
             throw new ApplicationException("Пароли не совпадают");
         }
 
+        // Валидация роли (нельзя зарегистрироваться как админ через API)
+        if (request.Role == UserRole.Admin)
+        {
+            throw new ApplicationException("Недопустимая роль для регистрации");
+        }
+
         // Хэшируем пароль
         var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
 
         // Создаем пользователя
-        var user = new User
+        var user = new UserProfile
         {
             Email = request.Email,
             PasswordHash = passwordHash,
             Name = request.Name,
             LastName = request.LastName,
             CreatedAt = DateTime.UtcNow,
+            Role = request.Role,
         };
+
+        if(request.Role == UserRole.Chef)
+        {
+            user.ChefProfile = new ChefProfile
+            {
+                KitchenName = request.KitchenName ?? $"{request.Name}'s Kitchen",
+                Description = request.ChefDescription ?? "Home Kitchen",
+                IsActive = false, // Не активен до верификации
+                User = user
+            };
+        }
 
         // Сохраняем в БД
         _context.Users.Add(user);
@@ -60,6 +81,7 @@ public class AuthService : IAuthService
         {
             Id = user.Id,
             Email = user.Email,
+            Role = user.Role,
         };
     }
 

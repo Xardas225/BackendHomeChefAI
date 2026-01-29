@@ -1,6 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
-namespace WebAPI.Controllers;
-
+﻿namespace WebAPI.Controllers;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using WebAPI.Models.User;
 using WebAPI.Services.Interfaces;

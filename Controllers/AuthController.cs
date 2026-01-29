@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebAPI.Services.Interfaces;
 using WebAPI.Models.Auth;
-
+    
 namespace WebAPI.Controllers;
 
 [ApiController]

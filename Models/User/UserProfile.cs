@@ -1,10 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore.Update.Internal;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using WebAPI.Models.User.Enums;
+using WebAPI.Models.Chef;
 
 namespace WebAPI.Models.User;
 [Table("users")] // Имя таблицы в MySQL
-public class User
+public class UserProfile
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -37,6 +39,9 @@ public class User
     public string? RefreshToken { get; set; }
     public DateTime? RefreshTokenExpiryTime { get; set; }
 
+    // Роль пользрователя  
+    public UserRole Role { get; set; }
+
     public void Update(string email,  string name, string lastName, string phone)
     {
         Email = email;
@@ -45,5 +50,8 @@ public class User
         Phone = phone;
         UpdatedAt = DateTime.UtcNow;
     }
+
+
+    public virtual ChefProfile? ChefProfile { get; set; }
 
 }
