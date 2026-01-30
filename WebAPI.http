@@ -37,3 +37,7 @@ GET {{WebAPI_HostAddress}}/api/users
 
 ###
 
+
+GET {{WebAPI_HostAddress}}/api/chefs
+
+###
