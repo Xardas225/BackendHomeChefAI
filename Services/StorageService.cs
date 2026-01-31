@@ -33,27 +33,39 @@ public class StorageService : IStorageService
         _bucketName = configuration["SelectelS3:BucketName"];
     }
 
-    public async Task<string> UploadFileAsync(FileRecordRequest request)
+    // Запись файла в S3-хранилище
+    public async Task<string> UploadFileAsync(IFormFile file)
     {
-        if (request.File == null || request.File.Length == 0)
+        if (file == null || file.Length == 0)
             throw new Exception("Файл пустой");
 
-        var fileName = Guid.NewGuid() + Path.GetExtension(request.File.FileName);
+        var fileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
 
         var transferUtility = new TransferUtility(_s3Client);
 
-        using var stream = request.File.OpenReadStream();
+        using var stream = file.OpenReadStream();
         await transferUtility.UploadAsync(stream, _bucketName, fileName);
 
-        var fileData = (new FileRecord
+        return $"https://{_bucketName}.s3.storage.selcloud.ru/{fileName}";
+    }
+
+    public async Task<string> SetUserAvatar(FileRecordRequest request)
+    {
+
+        var fileName = await UploadFileAsync(request.File);
+
+        var file = (new FileRecord
         {
             Url = $"https://{_bucketName}.s3.storage.selcloud.ru/{fileName}",
             UserId = request.UserId,
             UploadedAt = DateTime.UtcNow
         });
 
-        await _storageRepository.UploadFileAsync(fileData);
+        await _storageRepository.UploadFileAsync(file);
 
-        return $"https://{_bucketName}.s3.storage.selcloud.ru/{fileName}";
+        return fileName;
+
     }
+
+
 }

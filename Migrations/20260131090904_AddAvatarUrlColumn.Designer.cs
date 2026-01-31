@@ -12,8 +12,8 @@ using WebAPI.Data;
 namespace WebAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260130181652_AddFiles")]
-    partial class AddFiles
+    [Migration("20260131090904_AddAvatarUrlColumn")]
+    partial class AddAvatarUrlColumn
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -99,8 +99,8 @@ namespace WebAPI.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AvatarUrlId")
-                        .HasColumnType("varchar(255)");
+                    b.Property<string>("AvatarUrl")
+                        .HasColumnType("longtext");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -155,8 +155,6 @@ namespace WebAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AvatarUrlId");
-
                     b.HasIndex("Email")
                         .IsUnique()
                         .HasDatabaseName("IX_users_email");
@@ -179,15 +177,6 @@ namespace WebAPI.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("WebAPI.Models.User.UserProfile", b =>
-                {
-                    b.HasOne("WebAPI.Models.File.FileRecord", "AvatarUrl")
-                        .WithMany()
-                        .HasForeignKey("AvatarUrlId");
-
-                    b.Navigation("AvatarUrl");
                 });
 
             modelBuilder.Entity("WebAPI.Models.User.UserProfile", b =>

@@ -42,8 +42,8 @@ public class UserProfile
 
     // Роль пользрователя  
     public UserRole Role { get; set; }
-
-    public FileRecord? AvatarUrl { get; set; }
+        
+    public string? AvatarUrl { get; set; }
 
     public void Update(string email,  string name, string lastName, string phone)
     {
@@ -53,8 +53,7 @@ public class UserProfile
         Phone = phone;
         UpdatedAt = DateTime.UtcNow;
     }
-
-
+        
     public virtual ChefProfile? ChefProfile { get; set; }
 
 }

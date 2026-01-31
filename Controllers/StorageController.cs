@@ -20,7 +20,8 @@ public class UploadController : ControllerBase
     {
         try
         {   
-            var fileUrl = await _storageService.UploadFileAsync(request);
+            var fileUrl = await _storageService.SetUserAvatar(request);
+
             return Ok(new { url = fileUrl });
         }
         catch (Exception ex)
