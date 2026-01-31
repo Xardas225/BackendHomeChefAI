@@ -33,6 +33,6 @@ public class ChefProfileResponse
 
     public TimeSpan? StartTime { get; set; }
     public TimeSpan? EndTime { get; set; }
-
+    public string? AvatarUrl { get; set; }
     public ChefExperience ChefExperience { get; set; }
 }

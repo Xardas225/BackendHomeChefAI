@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.Services.Interfaces;
 using Microsoft.Extensions.Logging;
+using Microsoft.CodeAnalysis.FlowAnalysis.DataFlow;
 
 namespace WebAPI.Controllers;
 
@@ -34,6 +35,22 @@ public class ChefsController : ControllerBase
             return BadRequest(new { message = ex.Message });
         }
     }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetChefByUserId(int id)
+    {
+        try
+        {
+            _logger.LogInformation("GET-запрос шеф-повара по Id пользователя");
+            var chef = await _chefsService.GetChefByUserIdAsync(id);
+            return Ok(chef);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
 
 
 }

@@ -41,3 +41,8 @@ GET {{WebAPI_HostAddress}}/api/users
 GET {{WebAPI_HostAddress}}/api/chefs
 
 ###
+
+@id=18
+GET {{WebAPI_HostAddress}}/api/chefs/{{id}}
+
+###

@@ -21,7 +21,21 @@ public class ChefsService : IChefsService
     {
         var chefs = await _chefsRepository.GetAllChefsAsync();
 
-        var response = chefs.Select(chef => new ChefProfileResponse
+        var response = chefs.Select(chef => MapChefProfileResponse(chef)).ToList();
+
+        return response;
+    }
+
+    public async Task<ChefProfileResponse> GetChefByUserIdAsync(int id)
+    {
+        var chef = await _chefsRepository.GetChefByUserIdAsync(id);
+
+        return MapChefProfileResponse(chef);
+    }
+
+    public ChefProfileResponse MapChefProfileResponse(ChefProfile chef)
+    {
+        return new ChefProfileResponse
         {
             // UserProfile
             UserId = chef.User.Id,
@@ -29,6 +43,7 @@ public class ChefsService : IChefsService
             Phone = chef.User.Phone,
             Name = chef.User.Name,
             LastName = chef.User.LastName,
+            AvatarUrl = chef.User.AvatarUrl,
 
             // ChefProfile
             ChefId = chef.Id,
@@ -40,13 +55,7 @@ public class ChefsService : IChefsService
             StartTime = chef.StartTime,
             EndTime = chef.EndTime,
             ChefExperience = chef.ChefExperience
-        }).ToList();
-
-
-
-
-
-        return response;
+        };
     }
 
 }

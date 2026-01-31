@@ -33,4 +33,9 @@ public class ChefsRepository : IChefsRepository
 
         return chefs;
     }
+
+    public async Task<ChefProfile> GetChefByUserIdAsync(int id)
+    {
+        return await _dbContext.Chefs.Include(c => c.User).FirstOrDefaultAsync(chef => chef.UserId == id);
+    }
 }
