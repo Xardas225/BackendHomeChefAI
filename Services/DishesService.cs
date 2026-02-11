@@ -12,11 +12,13 @@ public class DishesService : IDishesService
 {
     private readonly IDishesRepository _dishesRepository;
     private readonly IChefsRepository _chefsRepository;
+    private readonly IIngredientsRepository _ingredientsRepository;
 
-    public DishesService(IDishesRepository dishesRepository, IChefsRepository chefsRepository)
+    public DishesService(IDishesRepository dishesRepository, IChefsRepository chefsRepository, IIngredientsRepository ingredientsRepository)
     {
         _dishesRepository = dishesRepository; 
         _chefsRepository = chefsRepository;
+        _ingredientsRepository = ingredientsRepository;
     }
 
     public async Task<List<DishResponse>> GetAllDishesAsync()
@@ -63,13 +65,35 @@ public class DishesService : IDishesService
             Author = chef,
             AuthorId = chef.Id,
             CreatedDate = createdDate,
+            CookTime = request.CookTime,
             Ingredients = new List<DishIngredientEntity> ()
         };
 
-        //if (request.Ingredients != null && request.Ingredients.Any())
-        //{
+        if (request.Ingredients != null && request.Ingredients.Any())
+        {
+                
+            foreach (var ingDto in request.Ingredients)
+            {
+                var ingredient = _ingredientsRepository.GetIngredientById(ingDto.Id);
 
-        //}
+                if(ingredient == null)
+                {
+                    throw new ApplicationException(
+                        $"Ингредиент с ID {ingDto.Id} не найден в справочнике"
+                    );
+                }
+
+                var dishIngredient = new DishIngredientEntity
+                {
+                    IngredientId = ingredient.Id,
+                    Weight = ingDto.Weight,
+                };
+
+                dish.Ingredients.Add(dishIngredient);
+
+            }
+
+        }
 
 
         await _dishesRepository.CreateDishAsync(dish);
