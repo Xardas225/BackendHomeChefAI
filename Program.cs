@@ -40,6 +40,13 @@ builder.Services.AddScoped<IDishesRepository, DishesRepository>();
 builder.Services.AddScoped<IIngredientsService, IngredientsService>();
 builder.Services.AddScoped<IIngredientsRepository, IngredientsRepository>();
 
+builder.Services.AddHttpClient<IVisionServiceClient, VisionServiceClient>(client =>
+{
+    var baseUrl = builder.Configuration["VisionService:Url"] ?? "http://localhost:8000";
+    client.BaseAddress = new Uri(baseUrl);
+    client.Timeout = TimeSpan.FromSeconds(30);
+});
+
 // ========== ПОДКЛЮЧЕНИЕ К MYSQL ==========
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 try

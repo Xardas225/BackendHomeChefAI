@@ -75,3 +75,12 @@ GET {{WebAPI_HostAddress}}/api/ingredients
 GET {{WebAPI_HostAddress}}/api/ingredients/{{id}}
 
 ###
+
+POST {{WebAPI_HostAddress}}/api/visionservice
+Content-Type: application/json
+  
+{
+  //IFormFile
+}
+
+###
