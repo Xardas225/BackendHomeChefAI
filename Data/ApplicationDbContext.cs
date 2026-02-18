@@ -4,6 +4,7 @@ using WebAPI.Models.User;
 using WebAPI.Models.File;
 using WebAPI.Models.Dish;
 using WebAPI.Models.Dish.Ingredient;
+using WebAPI.Models.Dish.Kitchens;
 
 namespace WebAPI.Data
 {
@@ -23,7 +24,10 @@ namespace WebAPI.Data
         public DbSet<DishEntity> Dishes { get; set; }
 
         public DbSet<IngredientEntity> Ingredients { get; set; }
+
         public DbSet<DishIngredientEntity> DishIngredients { get; set; }
+
+        public DbSet<KitchensEntity> Kitchens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

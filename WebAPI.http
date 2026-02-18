@@ -84,3 +84,7 @@ Content-Type: application/json
 }
 
 ###
+
+GET {{WebAPI_HostAddress}}/api/kitchens
+
+###

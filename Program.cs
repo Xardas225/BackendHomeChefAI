@@ -40,6 +40,9 @@ builder.Services.AddScoped<IDishesRepository, DishesRepository>();
 builder.Services.AddScoped<IIngredientsService, IngredientsService>();
 builder.Services.AddScoped<IIngredientsRepository, IngredientsRepository>();
 
+builder.Services.AddScoped<IKitchensRepository, KitchensRepository>();
+builder.Services.AddScoped<IKitchensService, KitchensService>();
+
 builder.Services.AddHttpClient<IVisionServiceClient, VisionServiceClient>(client =>
 {
     var baseUrl = builder.Configuration["VisionService:Url"] ?? "http://localhost:8000";
