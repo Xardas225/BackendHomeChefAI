@@ -1,4 +1,3 @@
-version: '3.8'
 
 services:
   mysql:
@@ -13,15 +12,26 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - mysql_data:/var/lib/mysql          # Постоянное хранение данных
-      - ./mysql/init:/docker-entrypoint-initdb.d  # Скрипты инициализации
-      - ./mysql/config:/etc/mysql/conf.d         # Конфигурационные файлы
+      - mysql_data:/var/lib/mysql
+      - ./mysql/init:/docker-entrypoint-initdb.d
+      - ./mysql/config:/etc/mysql/conf.d
     networks:
       - smartgym-network
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 20s
       retries: 10
+  redis:
+    image: redis:7-alpine 
+    container_name: redis-homechef
+    restart: unless-stopped
+    command: redis-server --requirepass redispassword --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis/data:/data 
+    networks:
+      - backend
 
 volumes:
   mysql_data:
@@ -29,4 +39,6 @@ volumes:
 
 networks:
   smartgym-network:
+    driver: bridge
+  backend:
     driver: bridge

@@ -104,6 +104,19 @@ builder.Services.AddCors(options =>
         });
 });
 
+
+var redisConnection = builder.Configuration.GetConnectionString("Redis");
+if (string.IsNullOrEmpty(redisConnection))
+{
+    throw new InvalidOperationException("Redis connection string is not configured.");
+}
+
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = redisConnection;
+});
+
+
 // Настройка JWT аутентификации
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var secretKey = jwtSettings["SecretKey"];
