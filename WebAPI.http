@@ -92,3 +92,11 @@ GET {{WebAPI_HostAddress}}/api/kitchens
 GET {{WebAPI_HostAddress}}/api/categories
 
 ###
+@id=11
+GET {{WebAPI_HostAddress}}/api/dishes/{{id}}
+
+###
+
+GET {{WebAPI_HostAddress}}/api/dishes/{{id}}
+
+###

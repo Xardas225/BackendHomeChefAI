@@ -34,6 +34,21 @@ public class DishesController : ControllerBase
         }
     }
 
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetDishById(int id)
+    {
+        try
+        {
+            var dish = await _dishesService.GetDishByIdAsync(id);
+
+            return Ok(dish);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
     [HttpPost]
     public async Task<IActionResult> CreateDish(DishRequest request)
     {

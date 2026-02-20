@@ -65,6 +65,13 @@ public class DishesRepository : IDishesRepository
         return await query.ToListAsync();
     }
 
+    public async Task<DishEntity> GetDishByIdAsync(int id)
+    {
+        return await _dbContext.Dishes.Include(d => d.Author)
+                                      .ThenInclude(a => a.User)
+                                      .FirstOrDefaultAsync(d => d.Id == id);
+    }
+
     public async Task<int> CreateDishAsync(DishEntity request)
     {
         _dbContext.Dishes.Add(request);

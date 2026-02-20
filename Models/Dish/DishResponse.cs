@@ -1,4 +1,6 @@
-﻿namespace WebAPI.Models.Dish;
+﻿using WebAPI.Models.Dish.Ingredient;
+
+namespace WebAPI.Models.Dish;
 
 public class DishResponse
 {
@@ -28,4 +30,10 @@ public class DishResponse
     // Владелец блюда
     public int AuthorId { get; set; }
     public string AuthorName { get; set; }
+
+    public DateTime CreatedDate { get; set; }
+
+    public int CookTime { get; set; }   
+
+    public List<DishIngredientEntity>? Ingredients { get; set; }
 }

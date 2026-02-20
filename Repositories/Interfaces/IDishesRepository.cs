@@ -8,4 +8,6 @@ public interface IDishesRepository
     public Task<List<DishEntity>> GetAllDishesAsync(DishFilters? filters, string? sort);
 
     public Task<int> CreateDishAsync(DishEntity request);
+
+    public Task<DishEntity> GetDishByIdAsync(int id);
 }
