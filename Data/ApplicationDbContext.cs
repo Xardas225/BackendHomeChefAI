@@ -5,137 +5,139 @@ using WebAPI.Models.File;
 using WebAPI.Models.Dish;
 using WebAPI.Models.Dish.Ingredient;
 using WebAPI.Models.Dish.Kitchens;
+using WebAPI.Models.Dish.Categories;
 
-namespace WebAPI.Data
+namespace WebAPI.Data;
+
+public class ApplicationDbContext : DbContext
 {
-    public class ApplicationDbContext : DbContext
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        : base(options)
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-            : base(options)
+    }
+
+    public DbSet<UserProfile> Users { get; set; }
+
+    public DbSet<ChefProfile> Chefs { get; set; }
+
+    public DbSet<FileRecord> Files { get; set; }
+
+    public DbSet<DishEntity> Dishes { get; set; }
+
+    public DbSet<IngredientEntity> Ingredients { get; set; }
+
+    public DbSet<DishIngredientEntity> DishIngredients { get; set; }
+
+    public DbSet<KitchensEntity> Kitchens { get; set; }
+
+    public DbSet<CategoryEntity> Categories { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        // Для корректной работы наследования и базовой конфигурации
+        base.OnModelCreating(modelBuilder);
+
+        // Конфигурация таблицы Users
+        modelBuilder.Entity<UserProfile>(entity =>
         {
-        }
+            // Название таблицы
+            entity.ToTable("users");
 
-        public DbSet<UserProfile> Users { get; set; }
+            // Первичный ключ
+            entity.HasKey(e => e.Id);
 
-        public DbSet<ChefProfile> Chefs { get; set; }
+            // Автоинкремент
+            entity.Property(e => e.Id)
+                .ValueGeneratedOnAdd();
 
-        public DbSet<FileRecord> Files { get; set; }
+            // Уникальный индекс для Email
+            entity.HasIndex(e => e.Email)
+                .IsUnique()
+                .HasDatabaseName("IX_users_email");
 
-        public DbSet<DishEntity> Dishes { get; set; }
+            // Индекс для Phone (не уникальный, так как может быть null)
+            entity.HasIndex(e => e.Phone)
+                .HasDatabaseName("IX_users_phone");
 
-        public DbSet<IngredientEntity> Ingredients { get; set; }
+            // Индекс для RefreshToken (для поиска)
+            entity.HasIndex(e => e.RefreshToken)
+                .HasDatabaseName("IX_users_refresh_token");
 
-        public DbSet<DishIngredientEntity> DishIngredients { get; set; }
+            // Конфигурация свойств
+            entity.Property(e => e.Email)
+                .IsRequired()
+                .HasMaxLength(255)
+                .HasColumnName("email");
 
-        public DbSet<KitchensEntity> Kitchens { get; set; }
+            entity.Property(e => e.PasswordHash)
+                .IsRequired()
+                .HasMaxLength(255)
+                .HasColumnName("password_hash");
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+            entity.Property(e => e.Phone)
+                .HasMaxLength(20)
+                .HasColumnName("phone");
+
+            entity.Property(e => e.Name)
+                .IsRequired()
+                .HasMaxLength(100)
+                .HasColumnName("name");
+
+            entity.Property(e => e.LastName)
+                .IsRequired()
+                .HasMaxLength(100)
+                .HasColumnName("last_name");
+
+            entity.Property(e => e.CreatedAt)
+                .IsRequired()
+                .HasColumnType("datetime")
+                .HasColumnName("created_at")
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            entity.Property(e => e.UpdatedAt)
+                .HasColumnType("datetime")
+                .HasColumnName("updated_at");
+
+            entity.Property(e => e.RefreshToken)
+                .HasMaxLength(500)
+                .HasColumnName("refresh_token");
+
+            entity.Property(e => e.RefreshTokenExpiryTime)
+                .HasColumnType("datetime")
+                .HasColumnName("refresh_token_expiry_time");
+        });
+    }
+
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        UpdateTimestamps();
+        return await base.SaveChangesAsync(cancellationToken);
+    }
+
+    private void UpdateTimestamps()
+    {
+        var entries = ChangeTracker.Entries()
+            .Where(e => e.Entity is UserProfile &&
+                       (e.State == EntityState.Added || e.State == EntityState.Modified));
+
+        foreach (var entry in entries)
         {
-            // Для корректной работы наследования и базовой конфигурации
-            base.OnModelCreating(modelBuilder);
+            var user = (UserProfile)entry.Entity;
+            var now = DateTime.UtcNow;
 
-            // Конфигурация таблицы Users
-            modelBuilder.Entity<UserProfile>(entity =>
+            if (entry.State == EntityState.Added)
             {
-                // Название таблицы
-                entity.ToTable("users");
-
-                // Первичный ключ
-                entity.HasKey(e => e.Id);
-
-                // Автоинкремент
-                entity.Property(e => e.Id)
-                    .ValueGeneratedOnAdd();
-
-                // Уникальный индекс для Email
-                entity.HasIndex(e => e.Email)
-                    .IsUnique()
-                    .HasDatabaseName("IX_users_email");
-
-                // Индекс для Phone (не уникальный, так как может быть null)
-                entity.HasIndex(e => e.Phone)
-                    .HasDatabaseName("IX_users_phone");
-
-                // Индекс для RefreshToken (для поиска)
-                entity.HasIndex(e => e.RefreshToken)
-                    .HasDatabaseName("IX_users_refresh_token");
-
-                // Конфигурация свойств
-                entity.Property(e => e.Email)
-                    .IsRequired()
-                    .HasMaxLength(255)
-                    .HasColumnName("email");
-
-                entity.Property(e => e.PasswordHash)
-                    .IsRequired()
-                    .HasMaxLength(255)
-                    .HasColumnName("password_hash");
-
-                entity.Property(e => e.Phone)
-                    .HasMaxLength(20)
-                    .HasColumnName("phone");
-
-                entity.Property(e => e.Name)
-                    .IsRequired()
-                    .HasMaxLength(100)
-                    .HasColumnName("name");
-
-                entity.Property(e => e.LastName)
-                    .IsRequired()
-                    .HasMaxLength(100)
-                    .HasColumnName("last_name");
-
-                entity.Property(e => e.CreatedAt)
-                    .IsRequired()
-                    .HasColumnType("datetime")
-                    .HasColumnName("created_at")
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-                entity.Property(e => e.UpdatedAt)
-                    .HasColumnType("datetime")
-                    .HasColumnName("updated_at");
-
-                entity.Property(e => e.RefreshToken)
-                    .HasMaxLength(500)
-                    .HasColumnName("refresh_token");
-
-                entity.Property(e => e.RefreshTokenExpiryTime)
-                    .HasColumnType("datetime")
-                    .HasColumnName("refresh_token_expiry_time");
-            });
-        }
-
-        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-        {
-            UpdateTimestamps();
-            return await base.SaveChangesAsync(cancellationToken);
-        }
-
-        private void UpdateTimestamps()
-        {
-            var entries = ChangeTracker.Entries()
-                .Where(e => e.Entity is UserProfile &&
-                           (e.State == EntityState.Added || e.State == EntityState.Modified));
-
-            foreach (var entry in entries)
+                user.CreatedAt = now;
+                user.UpdatedAt = now;
+            }
+            else if (entry.State == EntityState.Modified)
             {
-                var user = (UserProfile)entry.Entity;
-                var now = DateTime.UtcNow;
-
-                if (entry.State == EntityState.Added)
-                {
-                    user.CreatedAt = now;
-                    user.UpdatedAt = now;
-                }
-                else if (entry.State == EntityState.Modified)
-                {
-                    // Не перезаписываем CreatedAt при обновлении
-                    entry.Property("CreatedAt").IsModified = false;
-                    user.UpdatedAt = now;
-                }
+                // Не перезаписываем CreatedAt при обновлении
+                entry.Property("CreatedAt").IsModified = false;
+                user.UpdatedAt = now;
             }
         }
-
-
     }
+
+
 }

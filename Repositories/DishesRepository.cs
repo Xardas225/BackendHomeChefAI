@@ -33,6 +33,16 @@ public class DishesRepository : IDishesRepository
             query = query.Where(d => d.Price <= filters.MaxPrice);
         }
 
+        if(!string.IsNullOrEmpty(filters.Name))
+        {   
+            query = query.Where(d => d.Name.Contains(filters.Name));
+        }
+
+        if (!string.IsNullOrEmpty(filters.Kitchen))
+        {
+            query = query.Where(d => d.Kitchen == filters.Kitchen);
+        }
+
         return await query.ToListAsync();
     }
 
