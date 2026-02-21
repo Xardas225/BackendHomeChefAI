@@ -56,5 +56,12 @@ public class CartService : ICartService
         return Task.FromResult(0); 
     }
 
+    public async Task<int> GetCountItemsByUserIdAsync(int userId)
+    {
+        var count = await _cartRepository.GetCountItemsByUserIdAsync(userId);
+
+        return count;
+    }
+
 
 }

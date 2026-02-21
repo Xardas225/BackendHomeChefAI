@@ -33,7 +33,7 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<CategoryEntity> Categories { get; set; }
 
-    public DbSet<CartEntity> Cart_Items { get; set; }
+    public DbSet<CartEntity> CartItems { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

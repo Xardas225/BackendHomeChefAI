@@ -5,6 +5,9 @@ namespace WebAPI.Services.Interfaces;
 public interface ICartService
 {
     public Task AddItemToCartAsync(CartRequest request);
+
     public Task GetItemsFromCartAsync();
+
+    public Task<int> GetCountItemsByUserIdAsync(int userId);
 
 }

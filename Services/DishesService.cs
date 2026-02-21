@@ -80,7 +80,7 @@ public class DishesService : IDishesService
         if (dish.Author.User == null)
             throw new InvalidOperationException($"У автора блюда {id} отсутствует пользователь");
 
-        _logger.LogInformation("DISH {@dish}", dish); // используйте @ для сериализации
+        _logger.LogInformation("DISH {@dish}", dish);
 
         var dishResponse = new DishResponse
         {

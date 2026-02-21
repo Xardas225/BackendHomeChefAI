@@ -10,10 +10,12 @@ namespace WebAPI.Controllers;
 public class CartController : ControllerBase 
 {
     private readonly ICartService _cartService;
+    private readonly ILogger<CartController> _logger;   
 
-    public CartController(ICartService cartService)
+    public CartController(ICartService cartService, ILogger<CartController> logger)
     {
-        _cartService = cartService; 
+        _cartService = cartService;
+        _logger = logger;
     }
 
 
@@ -32,12 +34,26 @@ public class CartController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetItems(CartRequest request)
+    public async Task<IActionResult> GetCartItemsByUserId(CartRequest request)
     {
         try
         {
             return Ok();
         }   
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    [HttpGet("count/{id}")]
+    public async Task<IActionResult> GetCountItemsByUserId(int id)
+    {
+        try
+        {
+            var count = await _cartService.GetCountItemsByUserIdAsync(id);
+            return Ok(count);
+        }
         catch (Exception ex)
         {
             return BadRequest(new { message = ex.Message });
