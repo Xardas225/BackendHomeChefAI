@@ -10,12 +10,13 @@ namespace WebAPI.Services;
 
 public class ChefsService : IChefsService
 {
-
     private readonly IChefsRepository _chefsRepository;
+    private readonly IDishesService _dishesService;
 
-    public ChefsService(IChefsRepository chefsRepository)
+    public ChefsService(IChefsRepository chefsRepository, IDishesService dishesService)
     {
         _chefsRepository = chefsRepository;
+        _dishesService = dishesService;
     }
 
     public async Task<List<ChefProfileResponse>> GetAllChefsAsync()
@@ -31,7 +32,13 @@ public class ChefsService : IChefsService
     {
         var chef = await _chefsRepository.GetChefByUserIdAsync(id);
 
-        return MapChefProfileResponse(chef);
+        var dishes = await _dishesService.GetAllDishesByAuthorId(chef.Id);
+
+        var chefResponse = MapChefProfileResponse(chef);
+
+        chefResponse.dishes = dishes;
+
+        return chefResponse;
     }
 
     public async Task UpdateChefByUserIdAsync(ChefProfileRequest request)

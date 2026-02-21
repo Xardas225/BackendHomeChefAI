@@ -10,4 +10,6 @@ public interface IDishesRepository
     public Task<int> CreateDishAsync(DishEntity request);
 
     public Task<DishEntity> GetDishByIdAsync(int id);
+
+    public Task<List<DishEntity>> GetAllDishesByAuthorId(int id);
 }

@@ -9,4 +9,6 @@ public interface IDishesService
     public Task<int> CreateDishAsync(DishRequest request);
 
     public Task<DishResponse> GetDishByIdAsync(int id);
+
+    public Task<List<DishShortResponse>> GetAllDishesByAuthorId(int id);
 }

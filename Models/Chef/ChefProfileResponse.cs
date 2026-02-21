@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using WebAPI.Models.Chef.Enums;
+using WebAPI.Models.Dish;
 
 namespace WebAPI.Models.Chef;
 
@@ -35,4 +36,6 @@ public class ChefProfileResponse
     public TimeSpan? EndTime { get; set; }
     public string? AvatarUrl { get; set; }
     public ChefExperience ChefExperience { get; set; }
+
+    public List<DishShortResponse>? dishes { get; set; }
 }

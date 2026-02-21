@@ -47,6 +47,26 @@ public class DishesService : IDishesService
         return dishesResponse;
     }
 
+    public async Task<List<DishShortResponse>> GetAllDishesByAuthorId(int id)
+    {
+        var dishes = await _dishesRepository.GetAllDishesByAuthorId(id);
+
+        var dishesResponse = dishes.Select(dish =>
+        new DishShortResponse
+        {
+            Id = dish.Id,
+            Name = dish.Name,
+            Description = dish.Description,
+            Category = dish.Category,
+            Price = dish.Price,
+            Kitchen = dish.Kitchen,
+            CreatedDate = dish.CreatedDate,
+            CookTime = dish.CookTime,
+        }).ToList();
+
+        return dishesResponse;
+    }
+
     public async Task<DishResponse> GetDishByIdAsync(int id)
     {
         var dish = await _dishesRepository.GetDishByIdAsync(id);

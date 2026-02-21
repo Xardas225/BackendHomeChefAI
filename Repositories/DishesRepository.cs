@@ -72,6 +72,11 @@ public class DishesRepository : IDishesRepository
                                       .FirstOrDefaultAsync(d => d.Id == id);
     }
 
+    public async Task<List<DishEntity>> GetAllDishesByAuthorId(int id)
+    {
+        return await _dbContext.Dishes.Where(d => d.AuthorId == id).ToListAsync();
+    }
+
     public async Task<int> CreateDishAsync(DishEntity request)
     {
         _dbContext.Dishes.Add(request);
