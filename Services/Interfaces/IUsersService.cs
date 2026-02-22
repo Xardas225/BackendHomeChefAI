@@ -7,4 +7,5 @@ public interface IUsersService
     Task<List<UserResponse>> GetAllUsersAsync();
     Task<UserResponse> GetUserById(int id);
     Task<UserResponse> UpdateUserById(int id, UpdateUserRequest request);
+    public int GetRequiredUserId();
 }

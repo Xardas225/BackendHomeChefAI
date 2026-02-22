@@ -7,6 +7,7 @@ using WebAPI.Models.Dish.Ingredient;
 using WebAPI.Models.Dish.Kitchens;
 using WebAPI.Models.Dish.Categories;
 using WebAPI.Models.Cart;
+using WebAPI.Models.Order;
 
 namespace WebAPI.Data;
 
@@ -34,6 +35,10 @@ public class ApplicationDbContext : DbContext
     public DbSet<CategoryEntity> Categories { get; set; }
 
     public DbSet<CartEntity> CartItems { get; set; }
+
+    public DbSet<OrderEntity> Orders { get; set; }
+
+    public DbSet<OrderItem> OrderItems { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

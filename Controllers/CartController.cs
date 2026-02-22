@@ -34,6 +34,7 @@ public class CartController : ControllerBase
         }
     }
 
+    // TODO: вынести получение пользователя в Service через UsersService
     [HttpGet]
     public async Task<IActionResult> GetCartItemsByUserId()
     {
@@ -57,6 +58,7 @@ public class CartController : ControllerBase
         }
     }
 
+    // TODO: вынести получение пользователя в Service через UsersService
     [HttpGet("count")]
     public async Task<IActionResult> GetCountItemsByUserId()
     {   
@@ -80,6 +82,7 @@ public class CartController : ControllerBase
         }
     }
 
+    // TODO: вынести получение пользователя в Service через UsersService
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteFromCart(int id)
     {

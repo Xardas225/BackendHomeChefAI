@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using WebAPI.Models.User;
 using WebAPI.Repositories;
 using WebAPI.Repositories.Interfaces;
@@ -8,10 +9,12 @@ public class UsersService : IUsersService
 {   
 
     private readonly IUsersRepository _usersRepository;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public UsersService(IUsersRepository usersRepository)
+    public UsersService(IUsersRepository usersRepository, IHttpContextAccessor httpContextAccessor)
     {
         _usersRepository = usersRepository;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public async Task<List<UserResponse>> GetAllUsersAsync()
@@ -59,6 +62,30 @@ public class UsersService : IUsersService
             LastName = user.LastName,
             Phone = user.Phone
         };
+    }
+
+    public int? UserId
+    {   
+        get
+        {
+            var user = _httpContextAccessor.HttpContext?.User;
+            if (user?.Identity?.IsAuthenticated != true)
+                return null;
+
+            var claim = user.FindFirst(ClaimTypes.NameIdentifier);
+            if (claim != null && int.TryParse(claim.Value, out var id))
+                return id;
+
+            return null;
+        }
+    }
+
+    public int GetRequiredUserId()
+    {
+        var id = UserId;
+        if (!id.HasValue)
+            throw new UnauthorizedAccessException("Пользователь не аутентифицирован или идентификатор не найден");
+        return id.Value;
     }
 }
 
