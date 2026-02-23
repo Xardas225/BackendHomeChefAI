@@ -8,4 +8,6 @@ public interface IOrderService
 
     public Task<List<OrderResponseShort>> GetAllOrdersByUserIdAsync();
 
+    public Task<OrderResponse> GetOrderByOrderIdAsync(int orderId);
+
 }

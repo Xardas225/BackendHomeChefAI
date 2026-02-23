@@ -28,4 +28,11 @@ public class OrderRepository : IOrderRepository
                                       .ToListAsync();
     }
 
+    public async Task<OrderEntity> GetOrderByOrderIdAsync(int orderId, int userId)
+    {
+        return await _dbContext.Orders.Include(o => o.Items)
+                                      .ThenInclude(i => i.Dish)
+                                      .FirstOrDefaultAsync(order => order.Id == orderId && order.UserId == userId);
+    }
+
 }

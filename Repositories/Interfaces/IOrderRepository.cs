@@ -7,4 +7,6 @@ public interface IOrderRepository
     public Task CreateOrderAsync(OrderEntity order);
 
     public Task<List<OrderEntity>> GetAllOrdersByUserIdAsync(int userId);
+
+    public Task<OrderEntity> GetOrderByOrderIdAsync(int orderId, int userId);
 }

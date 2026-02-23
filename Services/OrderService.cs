@@ -116,4 +116,51 @@ public class OrderService : IOrderService
         return ordersResponse;
     }
 
+    public async Task<OrderResponse> GetOrderByOrderIdAsync(int orderId)
+    {
+        var userId = _usersService.GetRequiredUserId();
+
+        if (userId == null)
+        {
+            throw new ApplicationException($"Пользователя с ID={userId} не существует");
+        }
+
+        var order = await _orderRepository.GetOrderByOrderIdAsync(orderId, userId);
+
+        var orderResponse = new OrderResponse
+        {
+            Id = order.Id,
+            CreatedAt = order.CreatedAt,
+            Items = new List<OrderItemResponse>(),
+            Status = order.Status,
+            TotalSum = order.TotalSum,
+            PaymentStatus = order.PaymentStatus,
+            Amount = order.Amount,
+            PaymentMethod = order.PaymentMethod,
+            DeliveryAddress = order.DeliveryAddress,
+            ContactPhone = order.ContactPhone,
+            Email = order.Email,
+            Comment = order.Comment,
+        };
+
+        foreach (var item in order.Items)
+        {
+            var orderItem = new OrderItemResponse
+            {
+                Id = item.Id,
+                DishId = item.DishId,
+                DishName = item.Dish.Name,
+                DishDescription = item.Dish.Description,
+                DishAuthorId = item.Dish.AuthorId,
+                Amount = item.Amount,
+                UnitPrice = item.UnitPrice,
+                TotalPrice = item.TotalPrice
+            };
+
+            orderResponse.Items.Add(orderItem);
+        }
+
+        return orderResponse;
+    }
+
 }

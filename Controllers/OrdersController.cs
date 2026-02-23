@@ -49,4 +49,19 @@ public class OrdersController : ControllerBase
         }
     }
 
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetOrderByOrderId(int id)
+    {
+        try
+        {
+            var order = await _orderService.GetOrderByOrderIdAsync(id);
+
+            return Ok(order);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
 }
