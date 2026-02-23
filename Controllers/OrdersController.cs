@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Amazon.Runtime.Internal;
+using Microsoft.AspNetCore.Mvc;
 using WebAPI.Models.Order;
 using WebAPI.Services.Interfaces;
 
@@ -26,6 +27,21 @@ public class OrdersController : ControllerBase
             await _orderService.CreateOrderAsync(request);
 
             return Ok();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetAllOrdersByUserId()
+    {
+        try
+        {
+            var orders = await _orderService.GetAllOrdersByUserIdAsync();
+
+            return Ok(orders);
         }
         catch (Exception ex)
         {

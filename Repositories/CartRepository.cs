@@ -47,4 +47,10 @@ public class CartRepository : ICartRepository
         await _dbContext.CartItems.Where(c => c.UserId == userId && c.Id == itemId)
                                   .ExecuteDeleteAsync();
     }
+
+    public async Task DeleteAllItemsByUserIdAsync(int userId)
+    {
+        await _dbContext.CartItems.Where(c => c.UserId == userId)
+                                  .ExecuteDeleteAsync();
+    }
 }

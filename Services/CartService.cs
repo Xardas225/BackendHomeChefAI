@@ -84,4 +84,9 @@ public class CartService : ICartService
         await _cartRepository.DeleteFromCartAsync(itemId, userId);
     }
 
+    public async Task DeleteAllItemsByUserIdAsync(int userId)
+    {
+        await _cartRepository.DeleteAllItemsByUserIdAsync(userId);
+    }
+
 }

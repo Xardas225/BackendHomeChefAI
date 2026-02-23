@@ -12,4 +12,6 @@ public interface ICartRepository
 
     public Task DeleteFromCartAsync(int itemId, int userId);
 
+    public Task DeleteAllItemsByUserIdAsync(int userId);
+
 }

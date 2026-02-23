@@ -39,6 +39,9 @@ public class OrderEntity
     public int TotalSum { get; set; }
 
     [Required]
+    public int Amount { get; set; }
+
+    [Required]
     public string DeliveryAddress { get; set; }
 
     public string? ContactPhone { get; set; }

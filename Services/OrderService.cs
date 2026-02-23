@@ -11,18 +11,21 @@ public class OrderService : IOrderService
     private readonly IUsersRepository _usersRepository;
     private readonly IOrderRepository _orderRepository;
     private readonly IDishesRepository _dishesRepository;
+    private readonly ICartService _cartService;
 
 
     public OrderService(
         IUsersService usersService, 
         IUsersRepository usersRepository, 
         IOrderRepository orderRepository,
-        IDishesRepository dishesRepository)
+        IDishesRepository dishesRepository,
+        ICartService cartService)
     {
         _usersService = usersService;   
         _usersRepository = usersRepository;
         _orderRepository = orderRepository;
         _dishesRepository = dishesRepository;
+        _cartService = cartService;
     }
 
     public async Task CreateOrderAsync(OrderRequest request)
@@ -36,7 +39,7 @@ public class OrderService : IOrderService
         }
 
         var createdDate = DateTime.UtcNow;
-
+            
         var phone = request.Phone;
 
         var order = new OrderEntity
@@ -52,6 +55,7 @@ public class OrderService : IOrderService
             PaymentStatus = PaymentStatus.Pending,
             PaymentMethod = request.PaymentMethod,
             Items = new List<OrderItem>(),
+            Amount = 0,
             TotalSum = 0
         };
 
@@ -75,6 +79,8 @@ public class OrderService : IOrderService
 
             };
 
+            order.Amount += item.Amount;
+
             order.TotalSum += item.Amount * item.Price;
 
             order.Items.Add(orderItem);
@@ -82,5 +88,32 @@ public class OrderService : IOrderService
 
         await _orderRepository.CreateOrderAsync(order);
 
+        await _cartService.DeleteAllItemsByUserIdAsync(userId);
+
     }
+
+    public async Task<List<OrderResponseShort>> GetAllOrdersByUserIdAsync()
+    {
+        var userId = _usersService.GetRequiredUserId();
+
+        if(userId == null)
+        {
+            throw new ApplicationException($"Пользователя с ID={userId} не существует");
+        }
+
+        var orders = await _orderRepository.GetAllOrdersByUserIdAsync(userId);
+
+        var ordersResponse = orders.Select(order =>
+        new OrderResponseShort
+        {
+            Id = order.Id,
+            CreatedAt = order.CreatedAt,
+            Status = order.Status,
+            TotalSum = order.TotalSum,
+            Amount  = order.Amount
+        }).ToList();
+
+        return ordersResponse;
+    }
+
 }
