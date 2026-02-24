@@ -1,3 +1,8 @@
+networks:
+  shared:
+    external: true
+    name: homechef-shared
+
 services:
   mysql:
     image: mysql:8.0
@@ -15,7 +20,7 @@ services:
       - ./mysql/init:/docker-entrypoint-initdb.d
       - ./mysql/config:/etc/mysql/conf.d
     networks:
-      - homechef-network
+      - shared
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 20s
@@ -31,7 +36,7 @@ services:
     volumes:
       - ./redis/data:/data 
     networks:
-      - homechef-network 
+      - shared
 
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
@@ -42,7 +47,7 @@ services:
     ports:    
       - "2182:2181"
     networks:
-      - homechef-network 
+      - shared 
 
   kafka:
     image: confluentinc/cp-kafka:7.4.0
@@ -61,7 +66,7 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
     networks:
-      - homechef-network
+      - shared
 
   akhq:
     image: tchiotludo/akhq:latest
@@ -77,12 +82,9 @@ services:
               properties:
                 bootstrap.servers: "kafka:29092"
     networks:
-      - homechef-network
+      - shared
 
 volumes:
   mysql_data:
     driver: local
 
-networks:
-  homechef-network:
-    driver: bridge
