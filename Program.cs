@@ -1,13 +1,16 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Confluent.Kafka;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using WebAPI.Data;
+using WebAPI.Infrastructure.Kafka;
+using WebAPI.Infrastructure.Kafka.Interfaces;
+using WebAPI.Models.User.Enums;
 using WebAPI.Repositories;
 using WebAPI.Repositories.Interfaces;
 using WebAPI.Services;
 using WebAPI.Services.Interfaces;
-using WebAPI.Models.User.Enums;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
@@ -53,6 +56,14 @@ builder.Services.AddScoped<ICartService, CartService>();
 
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+
+
+var bootstrapServers = builder.Configuration.GetValue<string>("Kafka:BootstrapServers");
+
+Console.WriteLine($"bootstrapServers = {bootstrapServers} ");
+
+builder.Services.AddSingleton(new ProducerConfig { BootstrapServers = bootstrapServers });
+builder.Services.AddSingleton<IKafkaProducer, KafkaProducer>();
 
 
 builder.Services.AddHttpClient<IVisionServiceClient, VisionServiceClient>(client =>

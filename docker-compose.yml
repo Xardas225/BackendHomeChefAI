@@ -1,4 +1,3 @@
-
 services:
   mysql:
     image: mysql:8.0
@@ -21,6 +20,7 @@ services:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 20s
       retries: 10
+
   redis:
     image: redis:7-alpine 
     container_name: redis-homechef
@@ -31,7 +31,53 @@ services:
     volumes:
       - ./redis/data:/data 
     networks:
-      - backend
+      - homechef-network 
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: homechef-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181 
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:    
+      - "2182:2181"
+    networks:
+      - homechef-network 
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    container_name: homechef-kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9093:9093"  
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: EXTERNAL://0.0.0.0:9093,INTERNAL://0.0.0.0:29092
+      KAFKA_ADVERTISED_LISTENERS: EXTERNAL://localhost:9093,INTERNAL://kafka:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: EXTERNAL:PLAINTEXT,INTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    networks:
+      - homechef-network
+
+  akhq:
+    image: tchiotludo/akhq:latest
+    depends_on:
+      - kafka
+    ports:
+      - "8080:8080"
+    environment:
+      AKHQ_CONFIGURATION: |
+        akhq:
+          connections:
+            docker-kafka:
+              properties:
+                bootstrap.servers: "kafka:29092"
+    networks:
+      - homechef-network
 
 volumes:
   mysql_data:
@@ -39,6 +85,4 @@ volumes:
 
 networks:
   homechef-network:
-    driver: bridge
-  backend:
     driver: bridge

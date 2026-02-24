@@ -1,7 +1,9 @@
-﻿using WebAPI.Models.Order;
+﻿using WebAPI.Infrastructure.Kafka;
+using WebAPI.Infrastructure.Kafka.Interfaces;
+using WebAPI.Models.Order;
+using WebAPI.Models.Order.Enums;
 using WebAPI.Repositories.Interfaces;
 using WebAPI.Services.Interfaces;
-using WebAPI.Models.Order.Enums;
 
 namespace WebAPI.Services;
 
@@ -12,6 +14,7 @@ public class OrderService : IOrderService
     private readonly IOrderRepository _orderRepository;
     private readonly IDishesRepository _dishesRepository;
     private readonly ICartService _cartService;
+    private readonly IKafkaProducer _kafkaProducer;
 
 
     public OrderService(
@@ -19,13 +22,15 @@ public class OrderService : IOrderService
         IUsersRepository usersRepository, 
         IOrderRepository orderRepository,
         IDishesRepository dishesRepository,
-        ICartService cartService)
+        ICartService cartService,
+        IKafkaProducer kafkaProducer)
     {
         _usersService = usersService;   
         _usersRepository = usersRepository;
         _orderRepository = orderRepository;
         _dishesRepository = dishesRepository;
         _cartService = cartService;
+        _kafkaProducer = kafkaProducer;
     }
 
     public async Task CreateOrderAsync(OrderRequest request)
@@ -86,7 +91,21 @@ public class OrderService : IOrderService
             order.Items.Add(orderItem);
         }
 
+
         await _orderRepository.CreateOrderAsync(order);
+
+
+        var createdOrderEvent = new OrderCreatedEvent
+        {
+            OrderId = order.Id,
+            UserId = userId,
+            UserName = user.Name,
+            CreatedAt = order.CreatedAt,
+            Amount = order.Amount,
+            TotalSum = order.TotalSum,
+        };
+
+        await _kafkaProducer.ProduceAsync("order-created", createdOrderEvent);
 
         await _cartService.DeleteAllItemsByUserIdAsync(userId);
 
@@ -141,7 +160,7 @@ public class OrderService : IOrderService
             ContactPhone = order.ContactPhone,
             Email = order.Email,
             Comment = order.Comment,
-        };
+        };      
 
         foreach (var item in order.Items)
         {
