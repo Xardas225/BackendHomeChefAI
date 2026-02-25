@@ -2,10 +2,12 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Qdrant.Client;
 using System.Text;
 using WebAPI.Data;
 using WebAPI.Infrastructure.Kafka;
 using WebAPI.Infrastructure.Kafka.Interfaces;
+using WebAPI.Infrastructure.Qdrant;
 using WebAPI.Models.User.Enums;
 using WebAPI.Repositories;
 using WebAPI.Repositories.Interfaces;
@@ -64,6 +66,17 @@ Console.WriteLine($"bootstrapServers = {bootstrapServers} ");
 
 builder.Services.AddSingleton(new ProducerConfig { BootstrapServers = bootstrapServers });
 builder.Services.AddSingleton<IKafkaProducer, KafkaProducer>();
+
+builder.Services.AddSingleton(new QdrantClient("localhost", 6334));
+builder.Services.AddHostedService<QdrantInitializer>();
+
+
+builder.Services.AddHttpClient<IEmbeddingService, EmbeddingService>(client =>
+{
+    var baseUrl = "http://localhost:3000";
+    client.BaseAddress = new Uri(baseUrl);
+    client.Timeout = TimeSpan.FromSeconds(30);
+});
 
 
 builder.Services.AddHttpClient<IVisionServiceClient, VisionServiceClient>(client =>

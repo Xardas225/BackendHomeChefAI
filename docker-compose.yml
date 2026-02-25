@@ -84,6 +84,21 @@ services:
     networks:
       - shared
 
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: qdrant
+    ports:
+      - "6333:6333"  # REST API
+      - "6334:6334"  # gRPC
+    volumes:
+      - ./qdrant_storage:/qdrant/storage
+    environment:
+      - QDRANT__SERVICE__GRPC_PORT=6334
+      - QDRANT__SERVICE__HTTP_PORT=6333
+    restart: unless-stopped
+    networks:
+      - shared
+
 volumes:
   mysql_data:
     driver: local
